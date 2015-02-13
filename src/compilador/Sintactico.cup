@@ -1,0 +1,127 @@
+
+/*IMPORTACIONES*/
+
+package compilador;
+
+import java_cup.runtime.*;
+import java.io.FileReader;
+import compilador.Metodos;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+
+/* CODIGO DEL USUARIO PARA EL PARSER*/
+parser code {:
+
+    @Override
+    public void syntax_error(Symbol sy) {
+        token t=(token)sy.value;
+        done_parsing();
+        report_error("Error sintáctico cerca de \""+ t.getCadena()+"\" : ["+t.getRow()+" : "+t.getCol()+"]",null);
+    }
+
+    /* Reporte de error encontrado. */
+    public void report_error(String message, Object info) {
+        StringBuilder m = new StringBuilder("Error");
+        if (info instanceof java_cup.runtime.Symbol) {
+            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+            if (s.left >= 0) {                
+                m.append(" en la línea "+(s.left+1));
+                if (s.right >= 0)
+                    m.append(", columna "+(s.right+1));
+            }
+        }
+        m.append(" : "+message);
+        System.err.println(m);
+    }
+   
+    /* Cuando se encuentra un error de donde el sistema no puede recuperarse, se lanza un error fatal. Se despliega el mensaje
+        de error y se finaliza la ejecucion. */
+
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        System.exit(1);
+    }
+
+    /* Metodos para ordenar los numeros de forma descendente y ascendente. */
+
+    	/* Metodo de ordenar descendente*/
+
+ public String ordenarDescendente(String cadenanumeros) {
+        String numerosOrdenados = "";
+        int numeros[] = new int[cadenanumeros.length()];
+        for (int i = 0; i < cadenanumeros.length(); i++) {
+            numeros[i] = Integer.parseInt(cadenanumeros.charAt(i) + "");
+        }
+        Arrays.sort(numeros);
+
+        for (int i = numeros.length - 1; i >= 0; i--) {
+            numerosOrdenados = numerosOrdenados + numeros[i];
+        }
+        return numerosOrdenados;
+    }
+
+    	/* Metodo de ordenar ascendente*/
+
+ public String ordenarAscendente(String cadenanumeros) {
+        String numerosOrdenados = "";
+        int numeros[] = new int[cadenanumeros.length()];
+        for (int i = 0; i < cadenanumeros.length(); i++) {
+            numeros[i] = Integer.parseInt(cadenanumeros.charAt(i) + "");
+        }
+        Arrays.sort(numeros);
+        for (int i = 0; i < numeros.length; i++) {
+            numerosOrdenados = numerosOrdenados + numeros[i];
+        }
+        return numerosOrdenados;
+    }
+:}
+
+
+/*action code {:   :}*/
+
+/*TERMINALES*/
+
+terminal FINLINEA,ORDENARAS,ORDENARDS;
+terminal DIGITO;
+
+/*NO TERMINALES*/
+
+non terminal instruccion, programa;
+non terminal cadenaas,cadenadesc;
+
+/*GRAMATICAS*/
+start with programa;
+
+
+programa ::=  instruccion  FINLINEA;
+
+
+instruccion ::= cadenaas|cadenadesc;
+cadenaas ::= DIGITO:d ORDENARAS
+     {:
+    token t1 = (token) d;
+    System.out.println("Odenar Cadena Ascendente");
+    System.out.println("cadena Ingresada " + t1.getCadena());
+    String ordenarasc =new AnalizadorSintactico().ordenarAscendente(t1.getCadena());
+    System.out.println("cadena Salida = " + ordenarasc);
+    
+:};
+
+cadenadesc ::= DIGITO:e ORDENARDS
+    {:
+   token t2 = (token) e;
+    System.out.println("Odenar Cadena Descendente");
+    System.out.println("cadena Ingresada " + t2.getCadena());
+    String ordenardesc = new AnalizadorSintactico().ordenarDescendente(t2.getCadena());
+    System.out.println("cadena Salida =  " + ordenardesc);
+    
+:};
+
+
+
+
+
+
+
+
